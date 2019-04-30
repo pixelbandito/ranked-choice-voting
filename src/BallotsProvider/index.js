@@ -4,7 +4,7 @@ import shortid from 'shortid';
 export class BallotsProvider extends Component {
   static defaultBallot = {
     candidateRanks: [],
-    submittedDate: null,
+    dateSubmitted: null,
     submitted: false,
     id: shortid.generate(),
     pollId: '',

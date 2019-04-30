@@ -60,7 +60,7 @@ export class Ballot extends Component {
 
     addBallot({
       candidateRanks,
-      submittedDate: new Date().valueOf(),
+      dateSubmitted: new Date().valueOf(),
       submitted: true,
       id: shortid.generate(),
       pollId,
