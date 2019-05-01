@@ -5,7 +5,7 @@ export const defaultCandidate = {
   name: '',
 };
 
-export const generateCandidate = ({ candidate }) => ({
+export const generateCandidate = (candidate) => ({
   ...defaultCandidate,
   id: shortid.generate(),
   ...candidate,

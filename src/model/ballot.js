@@ -9,7 +9,7 @@ export const defaultBallot = {
   voterName: ''
 };
 
-export const generateBallot = ({ ballot }) => ({
+export const generateBallot = (ballot) => ({
   ...defaultBallot,
   dateSubmitted: new Date().valueOf(),
   id: shortid.generate(),
