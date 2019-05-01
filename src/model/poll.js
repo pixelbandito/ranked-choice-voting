@@ -10,17 +10,14 @@ export const defaultPoll = {
   name: '',
 };
 
-export const generatePoll = (poll) => {
-  console.log({ poll });
-  return ({
-    ...defaultPoll,
-    dateCreated: new Date().valueOf(),
-    dateEnabled: new Date().valueOf(),
-    dateUpdated: new Date().valueOf(),
-    id: shortid.generate(),
-    ...poll,
-  });
-};
+export const generatePoll = (poll) => ({
+  ...defaultPoll,
+  dateCreated: new Date().valueOf(),
+  dateEnabled: new Date().valueOf(),
+  dateUpdated: new Date().valueOf(),
+  id: shortid.generate(),
+  ...poll,
+});
 
 export default {
   defaultPoll,
