@@ -4,7 +4,7 @@ const candidatesEliminatedErrorMessage = 'All candidates have been eliminated.';
 const candidatesMissingErrorMessage = 'Coulnd\'t find any candidates.';
 
 class Results extends Component {
-  static getActivePollSortedBallotsArray = ({ poll, ballots}) => {
+  static getPollSortedBallotsArray = ({ poll, ballots }) => {
     const sortedBallotsArray = Object.entries(ballots)
       .filter(([id, ballot]) => ballot.pollId === poll.id)
       .sort(([id, ballot], [id2, ballot2]) => ballot.dateSubmitted > ballot2.dateSubmitted ? -1 : 1)
@@ -37,7 +37,7 @@ class Results extends Component {
     // TODO: Second round should be transferrable votes. not second round of voting
     const votes = Results.getRoundVotes({ ballotsArray });
 
-    console.log('calculateResults', { candidates, ballotsArray, winningThreshold, roundIndex, votes });
+    // console.log('calculateResults', { candidates, ballotsArray, winningThreshold, roundIndex, votes });
     const candidateIds = candidates.map(c => c.id);
 
     if (!candidateIds.length && roundIndex === 1) {
@@ -49,10 +49,10 @@ class Results extends Component {
     const winnerIds = candidateIds.filter(cId => votes[cId] && votes[cId] > winningThreshold);
 
     if (winnerIds.length) {
-      console.log('We have some winners!', { winnerIds });
+      // console.log('We have some winners!', { winnerIds });
       return { winnerIds };
     } else {
-      console.log('No winner yet...');
+      // console.log('No winner yet...');
 
       let leastVotesReceived = candidateIds.reduce((result, cId) => {
         const candidateVotes = votes[cId] || 0;
@@ -68,7 +68,7 @@ class Results extends Component {
 
       // TODO: Need a tie-breaking strategy
       if (loserIds.length) {
-        console.log('We have some losers!', { loserIds });
+        // console.log('We have some losers!', { loserIds });
 
         // TODO: Remove losers and go again.
 
@@ -78,7 +78,7 @@ class Results extends Component {
           candidateRanks: prevBallot.candidateRanks.filter(cId => loserIds.indexOf(cId) < 0),
         }));
 
-        console.log({ nextCandidates, nextBallotsArray });
+        // console.log({ nextCandidates, nextBallotsArray });
 
         try {
           return Results.calculateResults({
@@ -114,7 +114,7 @@ class Results extends Component {
       ballots,
     } = this.props;
 
-    const ballotsArray = Results.getActivePollSortedBallotsArray({
+    const ballotsArray = Results.getPollSortedBallotsArray({
       poll,
       ballots,
     });
@@ -155,7 +155,7 @@ class Results extends Component {
       winnerIds,
     } = this.state;
 
-    const sortedBallotsArray = Results.getActivePollSortedBallotsArray({
+    const sortedBallotsArray = Results.getPollSortedBallotsArray({
       poll,
       ballots,
     });

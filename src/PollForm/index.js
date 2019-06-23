@@ -1,3 +1,8 @@
-import PollForm from './PollForm';
+import React from 'react';
 
-export default PollForm;
+import PollForm from './Form';
+import PollFormProvider from './Provider';
+
+const ConnectedPollForm = (props) => <PollFormProvider {...props} ><PollForm /></PollFormProvider>;
+
+export default ConnectedPollForm;

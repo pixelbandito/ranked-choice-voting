@@ -1,17 +1,24 @@
+import PropTypes from 'prop-types';
 import shortid from 'shortid';
 
-export const defaultCandidate = {
+export const defaultProps = {
   id: '',
   name: '',
 };
 
 export const generateCandidate = (candidate) => ({
-  ...defaultCandidate,
+  ...defaultProps,
   id: shortid.generate(),
   ...candidate,
 });
 
+export const propTypes = {
+  id: PropTypes.string.isRequired,
+  name: PropTypes.string.isRequired,
+};
+
 export default {
-  defaultCandidate,
+  defaultProps,
   generateCandidate,
+  propTypes,
 };

@@ -2,52 +2,19 @@ import React, { Component } from 'react';
 import shortid from 'shortid';
 
 class Form extends Component {
-   state = {
-    polls: {},
-    newCandidateName: '',
-  }
-
-  componentDidMount() {
-    const { polls: nextPolls } = this.props;
-    const { polls: prevPolls } = this.state;
-
-    this.updatePolls({
-      nextPolls,
-      prevPolls,
-    });
-  }
-
-  componentDidUpdate(prevProps) {
-    const { polls: nextPolls } = this.props;
-    const { polls: prevPolls } = prevProps;
-
-    this.updatePolls({
-      nextPolls,
-      prevPolls,
-    });
-  }
-
-  updatePolls = ({
-    nextPolls,
-    prevPolls,
-  }) => {
-    if (nextPolls && JSON.stringify(prevPolls) !== JSON.stringify(nextPolls)) {
-      this.setState({ polls: nextPolls });
-    }
-  }
-
   getCandidateById = ({ candidateId, candidates }) => candidates.find(candidate => candidate.id === candidateId)
   getCandidateByName = ({ candidateName, candidates }) => candidates.find(candidate => candidate.name === candidateName)
 
   getAddCandidateDisabled = () => {
-    const { candidates } = this.props.activePoll;
-    const { newCandidateName } = this.state;
+    const {
+      activePoll: { candidates },
+      newCandidateName,
+    } = this.props;
 
     return !newCandidateName || this.getCandidateByName({
       candidateName: newCandidateName,
       candidates,
     });
-
   }
 
   submitAddCandidateForm = (event) => {
@@ -59,20 +26,18 @@ class Form extends Component {
   addCandidate = () => {
     const {
       activePoll,
-      setPoll,
+      newCandidateName,
+      onChangeNewCandidateName,
+      onChangePoll,
     } = this.props;
-
-    const { newCandidateName } = this.state;
 
     if (this.getAddCandidateDisabled()) {
       return;
     }
 
-    this.setState({
-      newCandidateName: '',
-    })
+    onChangeNewCandidateName('');
 
-    setPoll({
+    onChangePoll({
       ...activePoll,
       candidates: [
         ...activePoll.candidates,
@@ -84,24 +49,34 @@ class Form extends Component {
     });
   }
 
-  changeNewCandidateNameInput = (event) => {
+  handleChangeNewCandidateNameInput = (event) => {
+    const { onChangeNewCandidateName } = this.props;
     const newCandidateName = event.target.value;
 
-    this.setState(prevState => ({
-      ...prevState,
-      newCandidateName,
-    }));
+    onChangeNewCandidateName(newCandidateName);
   };
 
-  submitForm = (event) => {
-    const { setPolls } = this.props;
-    const { polls } = this.state;
-    setPolls(polls);
+  handleCancelForm = (event) => {
+    const {
+      revertPoll,
+    } = this.props;
+
+    revertPoll();
+    event.preventDefault();
+  }
+
+  handleSubmitForm = (event) => {
+    const {
+      activePoll,
+      onSubmitPoll,
+    } = this.props;
+
+    onSubmitPoll(activePoll);
     event.preventDefault();
   }
 
   renderNewCandidateForm = () => {
-    const { newCandidateName } = this.state;
+    const { newCandidateName } = this.props;
 
     return (
       <li key="newCandidate">
@@ -117,7 +92,7 @@ class Form extends Component {
             placeholder="Candidate name"
             type="text"
             value={newCandidateName}
-            onChange={this.changeNewCandidateNameInput}
+            onChange={this.handleChangeNewCandidateNameInput}
           />
           <button disabled={this.getAddCandidateDisabled()}>
             Add candidate
@@ -128,7 +103,12 @@ class Form extends Component {
   }
 
   handleChangeCandidateNameInput = (prevCandidate) => (event) => {
-    const { activePoll: { candidates } } = this.props;
+    const {
+      activePoll,
+      onChangePoll,
+    } = this.props;
+
+    const { candidates } = activePoll;
     const nextCandidateName = event.target.value;
 
     if (!nextCandidateName || this.getCandidateByName({
@@ -138,27 +118,16 @@ class Form extends Component {
       return;
     }
 
-    this.setState((prevState) => {
-      const { activePoll } = this.props;
-      const { polls: prevPolls } = prevState;
-      const { candidates: prevCandidates } = activePoll;
+    const nextCandidates = [...candidates];
 
-      const nextCandidates = [...prevCandidates];
+    nextCandidates.splice(candidates.indexOf(prevCandidate), 1, {
+      ...prevCandidate,
+      name: nextCandidateName,
+    });
 
-      nextCandidates.splice(prevCandidates.indexOf(prevCandidate), 1, {
-        ...prevCandidate,
-        name: nextCandidateName,
-      });
-
-      return ({
-        polls: {
-          ...prevPolls,
-          [activePoll.id]: {
-            ...activePoll,
-            candidates: nextCandidates,
-          },
-        },
-      });
+    onChangePoll({
+      ...activePoll,
+      candidates: nextCandidates,
     });
 
     event.stopPropagation();
@@ -190,34 +159,31 @@ class Form extends Component {
   }
 
   handleChangePollNameInput = (event) => {
-    const { activePoll } = this.props;
-    const { polls } = this.state;
+    const {
+      activePoll,
+      onChangePoll,
+    } = this.props;
+
     const nextName = event.target.value || activePoll.name;
 
-    this.setState(prevState => ({
-      polls: {
-        ...polls,
-        [activePoll.id]: {
-          ...activePoll,
-          name: nextName,
-        },
-      },
-    }));
+    onChangePoll({
+      ...activePoll,
+      name: nextName,
+    });
   }
 
   handleChangeEnabledCheckbox = (event) => {
-    const { activePoll } = this.props;
+    const {
+      activePoll,
+      onChangePoll,
+    } = this.props;
+
     const enabled = event.target.checked;
 
-    this.setState(prevState => ({
-      polls: {
-        ...prevState.polls,
-        [activePoll.id]: {
-          ...activePoll,
-          enabled,
-        },
-      },
-    }));
+    onChangePoll({
+      ...activePoll,
+      enabled,
+    });
   }
 
   render() {
@@ -230,27 +196,7 @@ class Form extends Component {
 
     return (
       <div>
-        <label htmlFor="pollSelect">
-          Select poll
-        </label>
-        <select
-          id="pollSelect"
-          onChange={this.handleChangePollSelect}
-          defaultValue="placeholder"
-        >
-          <option
-            disabled
-            value="placeholder"
-          >
-            Select a poll
-          </option>
-          <option
-            value="create"
-          >
-            Create a new poll
-          </option>
-        </select>
-        <form id="pollForm" onSubmit={this.submitForm}>
+        <form id="pollForm" onSubmit={this.handleSubmitForm}>
           <h1>
             Poll
           </h1>
@@ -281,11 +227,14 @@ class Form extends Component {
               Enable
           </label>
         </section>
-        <button type="button">
+        <button
+          onClick={this.handleCancelForm}
+          type="button"
+        >
           Cancel
         </button>
         <button
-          onClick={this.submitForm}
+          onClick={this.handleSubmitForm}
           type="button"
         >
           Save
@@ -294,5 +243,7 @@ class Form extends Component {
     );
   }
 }
+
+
 
 export default Form;

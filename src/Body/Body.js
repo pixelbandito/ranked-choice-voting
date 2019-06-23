@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
-import Login from '../Login';
+
+import ActivePollChooser from '../ActivePollChooser';
+import ActivePollIdProvider from '../ActivePollIdProvider';
 import PollForm from '../PollForm';
 import Ballot from '../Ballot';
 import PollsProvider from '../PollsProvider';
@@ -41,14 +43,20 @@ class Body extends Component {
       </div>
       {tab === 'pollForm' &&
         <PollsProvider>
-          <PollForm/>
+          <ActivePollIdProvider>
+            <ActivePollChooser/>
+            <PollForm/>
+          </ActivePollIdProvider>
         </PollsProvider>
       }
       {tab === 'ballot' &&
         <PollsProvider>
-          <BallotsProvider>
-            <Ballot/>
-          </BallotsProvider>
+          <ActivePollIdProvider>
+            <ActivePollChooser/>
+            <BallotsProvider>
+              <Ballot/>
+            </BallotsProvider>
+          </ActivePollIdProvider>
         </PollsProvider>
       }
       {tab === 'results' &&
@@ -58,9 +66,8 @@ class Body extends Component {
           </BallotsProvider>
         </PollsProvider>
       }
-      {false && <Login />}
     </div>
-  );;
+  );
   }
 }
 

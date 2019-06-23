@@ -17,27 +17,30 @@ const defaultCandidate2 = generateCandidate({
 });
 
 const defaultPoll = generatePoll({
-  name: 'Default poll',
-  enabled: true,
   candidates: [defaultCandidate1, defaultCandidate2],
+  enabled: true,
+  name: 'Default poll',
 });
 
 const defaultBallot1 = generateBallot({
-  voterName: 'Default voter',
-  enabled: true,
   candidateRanks: [defaultCandidate1.id, defaultCandidate2.id],
+  enabled: true,
+  pollId: defaultPoll.id,
+  voterName: 'Default voter',
 });
 
 const defaultBallot2 = generateBallot({
-  voterName: 'Default voter 2',
-  enabled: true,
   candidateRanks: [defaultCandidate1.id, defaultCandidate2.id],
+  enabled: true,
+  pollId: defaultPoll.id,
+  voterName: 'Default voter 2',
 });
 
 const defaultBallot3 = generateBallot({
-  voterName: 'Default voter 3',
-  enabled: true,
   candidateRanks: [defaultCandidate2.id, defaultCandidate1.id],
+  enabled: true,
+  pollId: defaultPoll.id,
+  voterName: 'Default voter 3',
 });
 
 const defaultProps = {
@@ -80,9 +83,26 @@ describe('<Results/>', () => {
       },
     };
 
+    describe('Results.getPollSortedBallotsArray', () => {
+      it('gets ballots array', () => {
+        const ballotsArray = Results.getPollSortedBallotsArray({
+          poll: defaultPoll,
+          ballots: singleRoundProps.ballots,
+        });
+
+        expect(ballotsArray).toHaveLength(3);
+        expect(ballotsArray).toEqual(expect.arrayContaining());
+      });
+
+      it('should sort array', () => {});
+
+      it('should only return ballots for the given poll', () => {});
+    });
+
+    describe('Results.calculateResults', () => {});
     it('Plurality wins', () => {
-      const ballotsArray = Results.getActivePollSortedBallotsArray({
-        defaultPoll,
+      const ballotsArray = Results.getPollSortedBallotsArray({
+        poll: defaultPoll,
         ballots: singleRoundProps.ballots,
       });
 
