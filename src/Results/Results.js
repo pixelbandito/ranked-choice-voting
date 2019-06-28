@@ -1,12 +1,16 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+
+import ActivePollIdContext from '../model/ActivePollIdContext';
 
 const candidatesEliminatedErrorMessage = 'All candidates have been eliminated.';
 const candidatesMissingErrorMessage = 'Coulnd\'t find any candidates.';
 
 class Results extends Component {
   static getPollSortedBallotsArray = ({ poll, ballots }) => {
+    console.log({ poll, ballots: Object.values(ballots) });
     const sortedBallotsArray = Object.entries(ballots)
-      .filter(([id, ballot]) => ballot.pollId === poll.id)
+      .filter(([id, ballot]) => ballot && ballot.pollId === poll.id)
       .sort(([id, ballot], [id2, ballot2]) => ballot.dateSubmitted > ballot2.dateSubmitted ? -1 : 1)
       .map(([id, ballot]) => {
         return ballot;
@@ -102,17 +106,38 @@ class Results extends Component {
   }
 
   state = {
-    winnerIds: [],
+    activePoll: {},
     errorMessage: '',
+    prevActivePollId: null,
+    winnerIds: [],
+  }
+
+  componentDidMount() {
+    this.updateActivePollFromProps();
+  }
+
+  componentDidUpdate() {
+    this.updateActivePollFromProps();
+  }
+
+  updateActivePollFromProps = () => {
+    const { polls } = this.props;
+    const activePollId = this.context;
+    const { prevActivePollId } = this.state;
+
+    if (activePollId !== prevActivePollId) {
+      this.setState({
+        prevActivePollId: activePollId,
+        activePoll: (activePollId && polls && polls[activePollId]) || {}
+      });
+    }
   }
 
   calculateWinner = () => {}
 
   handleClickCalculateWinners = () => {
-    const {
-      activePoll: poll,
-      ballots,
-    } = this.props;
+    const { ballots } = this.props;
+    const { activePoll: poll } = this.state;
 
     const ballotsArray = Results.getPollSortedBallotsArray({
       poll,
@@ -145,12 +170,10 @@ class Results extends Component {
   }
 
   render() {
-    const {
-      ballots,
-      activePoll: poll,
-    } = this.props;
+    const { ballots } = this.props;
 
     const {
+      activePoll: poll,
       errorMessage,
       winnerIds,
     } = this.state;
@@ -204,5 +227,12 @@ class Results extends Component {
     );
   }
 }
+
+Results.contextType = ActivePollIdContext;
+
+Results.propTypes = {
+  polls: PropTypes.shape(),
+  ballots: PropTypes.array,
+};
 
 export default Results;

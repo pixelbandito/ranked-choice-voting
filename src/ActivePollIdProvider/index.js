@@ -13,6 +13,8 @@ const ActivePollIdProvider = ({ children, ...passedProps}) => {
     setActivePollId(newestPollId);
   }
 
+  console.log(React.Children.map(children, child => console.log(child)));
+
   return (
     <ActivePollIdContext.Provider value={activePollId}>
       {React.Children.map(children, child => !React.isValidElement(child)

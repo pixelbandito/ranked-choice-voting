@@ -39,7 +39,6 @@ export class Ballot extends Component {
     prevProps,
     forceUpdate = false,
   }) => {
-    console.log({ prevProps });
     const nextActivePoll = (activePollId && props.polls && props.polls[activePollId]) || {};
     const prevActivePoll = (prevActivePollId && prevProps.polls && prevProps.polls[prevActivePollId]) || {};
     const { candidates: nextCandidates = [] } = nextActivePoll;
@@ -47,8 +46,6 @@ export class Ballot extends Component {
     let stateUpdates = {};
 
     if (activePollId !== prevActivePollId) {
-      console.log({ activePollId, prevActivePollId });
-
       stateUpdates = {
         ...stateUpdates,
         prevContext: activePollId,
@@ -56,12 +53,10 @@ export class Ballot extends Component {
     }
 
     if (JSON.stringify(nextCandidates) !== JSON.stringify(prevCandidates) || forceUpdate) {
-      console.log({ nextCandidates, prevCandidates });
       const shuffledCandidates = [...nextCandidates];
       shuffledCandidates.sort(() => Math.random() > 0.5 ? 1 : -1);
       const candidateRanks = shuffledCandidates.map(candidate => candidate.id);
 
-      console.log({ candidateRanks });
 
       stateUpdates = {
         ...stateUpdates,
@@ -69,8 +64,11 @@ export class Ballot extends Component {
       };
     }
 
-    console.log({ stateUpdates });
-    this.setState({ stateUpdates });
+    if (Object.keys(stateUpdates).length) {
+      this.setState({
+        ...stateUpdates,
+      });
+    }
   }
 
   onChangeCandidateRankInput = candidateId => event => {
@@ -113,7 +111,14 @@ export class Ballot extends Component {
     });
 
     this.setState({ voterName: '' });
-    this.updateShuffledCandidatesFromProps({ nextProps: this.props, forceUpdate: true });
+
+    this.updateShuffledCandidatesFromProps({
+      forceUpdate: true,
+      activePollId: this.context,
+      props: this.props,
+      prevActivePollId: this.context,
+      prevProps: this.props,
+    });
   }
 
   render() {
@@ -147,9 +152,11 @@ export class Ballot extends Component {
           <section>
             <ul>
               {candidateRanks.map((candidateId, i) => {
-                const candidate = candidates.find(candidate => candidate.id ===candidateId);
+                const candidate = candidates.find(candidate => candidate.id === candidateId);
 
-                console.log({candidate, candidates});
+                if (!candidate) {
+                  return null;
+                }
 
                 return (
                   <li key={candidate.id}>

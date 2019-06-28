@@ -52,7 +52,7 @@ class Body extends Component {
       {tab === 'ballot' &&
         <PollsProvider>
           <ActivePollIdProvider>
-            <ActivePollChooser/>
+            <ActivePollChooser />
             <BallotsProvider>
               <Ballot/>
             </BallotsProvider>
@@ -61,9 +61,12 @@ class Body extends Component {
       }
       {tab === 'results' &&
         <PollsProvider>
-          <BallotsProvider>
-            <Results/>
-          </BallotsProvider>
+          <ActivePollIdProvider>
+            <ActivePollChooser/>
+            <BallotsProvider>
+              <Results/>
+            </BallotsProvider>
+          </ActivePollIdProvider>
         </PollsProvider>
       }
     </div>
